@@ -231,15 +231,14 @@ def main() -> None:
             if roi < cfg["min_roi"]:
                 continue
 
-            flags = assess_risk(item)
-            msg   = build_message(item, keyword, profit, roi, flags, fees)
-
             try:
+                flags = assess_risk(item)
+                msg   = build_message(item, keyword, profit, roi, flags, fees)
                 bot.send_message(CHAT_ID, msg, disable_web_page_preview=False)
                 alerts += 1
                 time.sleep(random.uniform(*DELAY_TELEGRAM))
             except Exception as exc:
-                print(f"[WARN] Telegram send failed: {exc}")
+                print(f"[WARN] Skipping item {item_id}: {exc}")
 
         time.sleep(random.uniform(*DELAY_BETWEEN_KEYWORDS))
 
