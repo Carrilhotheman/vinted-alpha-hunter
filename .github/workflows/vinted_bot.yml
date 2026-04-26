@@ -5,12 +5,19 @@ on:
     - cron: '*/15 * * * *'
   workflow_dispatch:
 
+# Prevent two runs from overlapping and racing on seen_items.json.
+# A new run triggered while one is active will queue and wait.
+concurrency:
+  group: vinted-bot
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 12   # never block the queue for more than 12 min
 
     steps:
       - name: Checkout repository
@@ -43,5 +50,6 @@ jobs:
             echo "No new items found, skipping commit."
           else
             git commit -m "chore: update seen_items.json [skip ci]"
+            git pull --rebase origin main
             git push
           fi
